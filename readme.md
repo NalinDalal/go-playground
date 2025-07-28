@@ -41,12 +41,11 @@ fmt.Println(e)              //0
 
 
 --------------------------------------
-docs: https://go.dev/doc/tutorial/getting-started
-tour: https://go.dev/tour/basics/1
-web-dev in go: https://gowebexamples.com/
+![docs](https://go.dev/doc/tutorial/getting-started)
+![tour](https://go.dev/tour/basics/1)
+![web-dev in go](https://gowebexamples.com/)
 
-officially to go thru like book: https://gobyexample.com/
+![officially to go thru like book](https://gobyexample.com/)
 
-gobook: https://github.com/adonovan/gopl.io
+![gobook](https://github.com/adonovan/gopl.io)
 
---------------------------------------
