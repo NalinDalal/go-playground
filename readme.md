@@ -85,7 +85,67 @@ i := 1
 
 ```
 
-[continue here](https://gobyexample.com/constants)
+# If/Else
+can skip else completely it want to, works without parantheses
+
+yeah doesn't have any ternary operator
+```go
+package main
+
+import "fmt"
+
+func main() {
+
+    if 7%2 == 0 {
+        fmt.Println("7 is even")
+    } else {
+        fmt.Println("7 is odd")
+    }
+
+    if 8%4 == 0 {
+        fmt.Println("8 is divisible by 4")
+    }
+
+    if 8%2 == 0 || 7%2 == 0 {
+        fmt.Println("either 8 or 7 are even")
+    }
+
+    if num := 9; num < 0 {
+        fmt.Println(num, "is negative")
+    } else if num < 10 {
+        fmt.Println(num, "has 1 digit")
+    } else {
+        fmt.Println(num, "has multiple digits")
+    }
+}
+```
+
+# Switch Statement
+switch is for like multiple if-else but in a beautiful way
+```go
+switch i {
+    case 1:
+        fmt.Println("one")
+    case 2:
+        fmt.Println("two")
+    case 3:
+        fmt.Println("three")
+    default:
+        fmt.Println("no num")
+    }
+```
+
+You can use commas to separate multiple expressions in the same case statement.
+```go
+switch time.Now().Weekday() {
+    case time.Saturday, time.Sunday:
+        fmt.Println("It's the weekend")
+    default:
+        fmt.Println("It's a weekday")
+    }
+```
+
+[continue here](https://gobyexample.com/arrays)
 
 
 
