@@ -204,7 +204,96 @@ twoD = [2][3]int{
 fmt.Println("2d: ", twoD)
 ```
 
-[continue here](https://gobyexample.com/slices)
+# Slices
+
+slices are typed only by the elements they contain (not the number of elements). An uninitialized slice equals to nil and has length 0.
+To create a slice with non-zero length, use the builtin make.
+
+```go
+var s []string
+    fmt.Println("uninit:", s, s == nil, len(s) == 0)
+
+s = make([]string, 3)
+    fmt.Println("emp:", s, "len:", len(s), "cap:", cap(s))
+```
+
+we make a slice of strings of length 3 (initially zero-valued). By default a new slice’s capacity is equal to its length; if we know the slice is going to grow ahead of time, it’s possible to pass a capacity explicitly as an additional parameter to make.
+
+```go
+s = make([]string, 3)
+    fmt.Println("emp:", s, "len:", len(s), "cap:", cap(s))
+```
+
+there are more of methods which make slices richer than arrays
+
+- append method: returns a slice containing one or more new values
+
+```go
+s = append(s, "d")
+    s = append(s, "e", "f")
+    fmt.Println("apd:", s)
+```
+
+- copy : copy into c from s.
+
+```go
+c := make([]string, len(s))
+    copy(c, s)
+    fmt.Println("cpy:", c)
+```
+
+- slices can also be used as similar to python syntax
+
+```go
+l := s[2:5]
+    fmt.Println("sl1:", l)
+```
+
+- slices up to (but excluding) s[5].
+
+```go
+l = s[:5]
+    fmt.Println("sl2:", l)
+```
+
+- slices up from (and including) s[2].
+
+```go
+l = s[2:]
+    fmt.Println("sl3:", l)
+```
+
+- declare and initialize a variable for slice in a single line
+
+```go
+t := []string{"g", "h", "i"}
+    fmt.Println("dcl:", t)
+```
+
+- other utility functions:
+
+```go
+t2 := []string{"g", "h", "i"}
+    if slices.Equal(t, t2) {
+        fmt.Println("t == t2")
+    }
+```
+
+- working with multi-dimension data
+
+```go
+twoD := make([][]int, 3)
+    for i := range 3 {
+        innerLen := i + 1
+        twoD[i] = make([]int, innerLen)
+        for j := range innerLen {
+            twoD[i][j] = i + j
+        }
+    }
+    fmt.Println("2d: ", twoD)
+```
+
+[continue here](https://gobyexample.com/maps)
 
 ---
 
