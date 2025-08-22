@@ -397,6 +397,25 @@ _, c := vals()
     fmt.Println(c)
 ```
 
+# Variadic Functions
+
+can be called with any number of trailing arguments.
+
+Variadic functions can be called in the usual way with individual arguments.
+
+```go
+func sum(nums ...int) {
+    fmt.Print(nums, " ")
+    total := 0
+//Within the function, the type of nums is equivalent to []int. We can call len(nums), iterate over it with range, etc.
+
+    for _, num := range nums {
+        total += num
+    }
+    fmt.Println(total)
+}
+```
+
 [continue here](https://gobyexample.com/maps)
 
 ---
