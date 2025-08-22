@@ -293,6 +293,66 @@ twoD := make([][]int, 3)
     fmt.Println("2d: ", twoD)
 ```
 
+# Maps
+
+built-in associative data types
+
+use the builtin make: `make(map[key-type]val-type)`.
+
+Set key/value pairs using typical `name[key] = val` syntax.
+
+```go
+m := make(map[string]int)
+
+    m["k1"] = 7
+    m["k2"] = 13
+```
+
+to print all of values:
+
+```go
+fmt.Println("map:", m)
+```
+
+get a value for a key with `name[key]`
+
+```go
+    v3 := m["k3"]
+    fmt.Println("v3:", v3)
+```
+
+`len(m)`- length of map
+
+builtin delete removes key/value pairs from a map.
+
+```go
+delete(m, "k2")
+    fmt.Println("map:", m)
+```
+
+remove all key/value pairs from a map, use the clear builtin.
+
+```go
+clear(m)
+    fmt.Println("map:", m)
+```
+
+declare and initialize a new map in the same line with this syntax.
+
+```go
+n := map[string]int{"foo": 1, "bar": 2}
+    fmt.Println("map:", n)
+```
+
+some utility function:
+
+```go
+n2 := map[string]int{"foo": 1, "bar": 2}
+    if maps.Equal(n, n2) {
+        fmt.Println("n == n2")
+    }
+```
+
 [continue here](https://gobyexample.com/maps)
 
 ---
