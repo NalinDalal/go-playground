@@ -353,6 +353,32 @@ n2 := map[string]int{"foo": 1, "bar": 2}
     }
 ```
 
+# Function
+
+function are something which takes some input and produce some output
+ex: a function that takes two ints and returns their sum as an int.
+
+```go
+func plus(a int, b int) int {
+    return a + b
+}
+
+func main(){
+    res := plus(1, 2)
+    fmt.Println("1+2 =", res)
+}
+```
+
+When you have multiple consecutive parameters of the same type, you may omit the type name for the like-typed parameters up to the final parameter that declares the type.
+
+```go
+func plusPlus(a, b, c int) int {
+    return a + b + c
+}
+```
+
+Call a function just as you’d expect, with name(args).
+
 [continue here](https://gobyexample.com/maps)
 
 ---
