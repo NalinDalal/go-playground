@@ -379,6 +379,24 @@ func plusPlus(a, b, c int) int {
 
 Call a function just as you’d expect, with name(args).
 
+## Multiple Return Value
+
+built-in support for multiple return values
+useful in idomatic go where you return both result and error
+
+```go
+func vals() (int, int) {        //(int, int) in this function signature shows that the function returns 2 ints.
+    return 3, 7
+}
+```
+
+If you only want a subset of the returned values, use the blank identifier \_.
+
+```go
+_, c := vals()
+    fmt.Println(c)
+```
+
 [continue here](https://gobyexample.com/maps)
 
 ---
