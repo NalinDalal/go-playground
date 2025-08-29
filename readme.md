@@ -416,12 +416,50 @@ func sum(nums ...int) {
 }
 ```
 
-[continue here](https://gobyexample.com/maps)
+# Closures
+
+A closure is a function value that captures variables from its surrounding scope. Even after the surrounding function has returned, the closure can still access and modify those captured variables.
+
+Here functions are first-class citizens, so you can define and return functions from other functions. Closures make use of this.
+
+1. A closure is created when an inner function **references variables defined outside its body**.
+
+2. The captured variables are **shared** across all closures created in that scope.
+
+3. Closures are often used to **maintain state** between function calls without using global variables.
+
+```go
+func intSeq() func() int {
+    i := 0
+    return func() int {
+        i++
+        return i
+    }
+}
+```
+
+# Recursion
+
+function that calls itself
+
+```go
+var fib func(n int) int
+    fib = func(n int) int {
+        if n < 2 {
+            return n
+        }
+return fib(n-1) + fib(n-2)
+    }
+```
+
+--
+[continue here](https://gobyexample.com/range-over-built-in-types)
 
 ---
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
+[tcp-to-http](https://www.youtube.com/watch?v=FknTw9bJsXM&list=WL&index=1&t=18s)
 [web-dev in go](https://gowebexamples.com/)
 
 [officially to go thru like book](https://gobyexample.com/)
