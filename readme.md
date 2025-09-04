@@ -452,8 +452,38 @@ return fib(n-1) + fib(n-2)
     }
 ```
 
+# Range over Built-in Types
+
+range iterates over elements in a variety of built-in data structures.
+
+```go
+//over array
+for _, num := range nums {  //index ignored
+        sum += num
+    }
+
+for i, num := range nums {
+        if num == 3 {
+            fmt.Println("index:", i)
+        }
+    }
+```
+
+```go
+//over maps
+kvs := map[string]string{"a": "apple", "b": "banana"}
+    for k, v := range kvs {
+        fmt.Printf("%s -> %s\n", k, v)
+    }
+
+//over keys of map
+for k := range kvs {
+        fmt.Println("key:", k)
+    }
+```
+
 --
-[continue here](https://gobyexample.com/range-over-built-in-types)
+[continue here](https://gobyexample.com/pointers)
 
 ---
 
