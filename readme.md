@@ -482,8 +482,49 @@ for k := range kvs {
     }
 ```
 
---
-[continue here](https://gobyexample.com/pointers)
+# Pointers
+
+allows to pass references to values and records within the program
+
+pass by value
+
+```go
+func zeroval(ival int) {    //parameter is int
+    ival = 0
+}
+```
+
+pass by pointer
+
+```go
+func zeroptr(iptr *int) {
+    *iptr = 0
+}
+```
+
+`zeroptr` in contrast has an `*int` parameter, meaning that it takes an int pointer.
+
+`*iptr` _dereferences_ the pointer from its memory address to the current value at that address.
+
+`&i` gives the memory address of i
+i.e. a pointer to i
+
+```go
+zeroptr(&i)
+fmt.Println("zeroptr:", i)
+```
+
+pointers can be printed too
+
+```go
+fmt.Println("pointer:", &i)
+```
+
+---
+
+# Strings and Runes
+
+[continue here](https://gobyexample.com/strings-and-runes)
 
 ---
 
