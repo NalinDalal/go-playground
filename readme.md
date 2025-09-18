@@ -524,7 +524,95 @@ fmt.Println("pointer:", &i)
 
 # Strings and Runes
 
-[continue here](https://gobyexample.com/strings-and-runes)
+Strings in Go are **read-only slices of bytes**.
+They are containers of UTF-8 encoded text, but indexing a string gives you **bytes**, not “characters.”
+
+A **rune** is Go’s term for a **Unicode code point** (type `int32`).
+
+### String basics
+
+```go
+const s = "สวัสดี" // "hello" in Thai
+```
+
+`len(s)` → gives the number of **bytes**, not runes.
+
+```go
+fmt.Println("Len:", len(s))  // 18
+```
+
+Indexing a string gives the raw **byte values**:
+
+```go
+for i := 0; i < len(s); i++ {
+    fmt.Printf("%x ", s[i])
+}
+// e0 b8 aa e0 b8 a7 ...
+```
+
+### Counting runes
+
+Use the `utf8` package to count runes (decoded code points):
+
+```go
+import "unicode/utf8"
+
+fmt.Println("Rune count:", utf8.RuneCountInString(s)) // 6
+```
+
+### Iterating over runes
+
+`range` on a string decodes runes automatically:
+
+```go
+for idx, r := range s {
+    fmt.Printf("%#U starts at %d\n", r, idx)
+}
+```
+
+Output:
+
+```
+U+0E2A 'ส' starts at 0
+U+0E27 'ว' starts at 3
+...
+```
+
+Equivalent explicit decoding:
+
+```go
+for i, w := 0, 0; i < len(s); i += w {
+    r, w := utf8.DecodeRuneInString(s[i:])
+    fmt.Printf("%#U starts at %d\n", r, i)
+}
+```
+
+### Rune literals
+
+Runes use **single quotes**:
+
+```go
+func examineRune(r rune) {
+    if r == 'ส' {
+        fmt.Println("found so sua")
+    } else if r == 't' {
+        fmt.Println("found tee")
+    }
+}
+```
+
+### Key points
+
+- A **string** is a sequence of bytes.
+- String **literals** are UTF-8 by default.
+- A **rune** = Unicode code point (`int32`).
+- `len(string)` counts **bytes**, not runes.
+- Use `utf8.RuneCountInString` or `range` for runes.
+- Indexing gives **bytes**, not runes.
+
+---
+
+[continue here](https://gobyexample.com/structs)
 
 ---
 
