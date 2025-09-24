@@ -612,7 +612,70 @@ func examineRune(r rune) {
 
 ---
 
-[continue here](https://gobyexample.com/structs)
+# Structs
+
+typed collections of fields. They’re useful for grouping data together to form records.
+
+ex:
+
+person struct type has name and age fields.
+
+```go
+type person struct {
+    name string
+    age  int
+}
+```
+
+`newPerson` constructs a new person struct with the given name.
+
+```go
+func newPerson(name string) *person {
+
+    p := person{name: name}
+    p.age = 42
+    return &p
+}
+```
+
+Go is a garbage collected language; you can safely return a pointer to a local variable - it will only be cleaned up by the garbage collector when there are no active references to it.
+
+- can name fields while initialising
+- Omitted fields will be zero-valued.
+- An `&` prefix yields a pointer to the struct.
+
+idiomatic to encapsulate new struct creation in constructor functions
+
+Access struct fields with a dot.
+
+```go
+s := person{name: "Sean", age: 50}
+    fmt.Println(s.name)
+```
+
+use dots with struct pointers - the pointers are automatically dereferenced.
+
+```go
+sp := &s
+    fmt.Println(sp.age)
+```
+
+they mutable
+
+when using for single value, no need to give it name; it can have anonymous struct type.
+
+```go
+dog := struct {
+        name   string
+        isGood bool
+    }{
+        "Rex",
+        true,
+    }
+fmt.Println(dog)
+```
+
+[continue here](https://gobyexample.com/methods)
 
 ---
 
