@@ -675,7 +675,33 @@ dog := struct {
 fmt.Println(dog)
 ```
 
-[continue here](https://gobyexample.com/methods)
+---
+
+# Methods
+
+go supports method defined on struct types
+
+```go
+
+func (r *rect) area() int {
+    return r.width * r.height
+}
+```
+
+This area method has a receiver type of \*rect.
+
+Methods can be defined for either pointer or value receiver types.
+
+```go
+func (r rect) perim() int {
+    return 2*r.width + 2*r.height
+}
+```
+
+Go automatically handles conversion between values and pointers for method calls.
+You may want to use a pointer receiver type to avoid copying on method calls or to allow the method to mutate the receiving struct.
+
+[continue here](https://gobyexample.com/interfaces)
 
 ---
 
