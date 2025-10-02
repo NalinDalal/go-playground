@@ -701,7 +701,44 @@ func (r rect) perim() int {
 Go automatically handles conversion between values and pointers for method calls.
 You may want to use a pointer receiver type to avoid copying on method calls or to allow the method to mutate the receiving struct.
 
-[continue here](https://gobyexample.com/interfaces)
+---
+
+# Interfaces
+
+Interfaces are named collections of method signatures.
+
+ex:
+```go
+type geometry interface {
+    area() float64
+    perim() float64
+}
+type rect struct {
+    width, height float64
+}
+//implement this interfaces on rectangle type
+func (r rect) area() float64 {
+    return r.width * r.height
+}
+func (r rect) perim() float64 {
+    return 2*r.width + 2*r.height
+}
+```
+To implement an interface in Go, we just need to implement all the methods in the interface.
+
+
+If a variable has an interface type, then we can call methods that are in the named interface.
+
+```go
+func measure(g geometry) {
+    fmt.Println(g)
+    fmt.Println(g.area())
+    fmt.Println(g.perim())
+}
+```
+
+
+[continue here](https://gobyexample.com/enums)
 
 ---
 
