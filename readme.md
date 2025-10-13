@@ -708,6 +708,7 @@ You may want to use a pointer receiver type to avoid copying on method calls or 
 Interfaces are named collections of method signatures.
 
 ex:
+
 ```go
 type geometry interface {
     area() float64
@@ -724,8 +725,8 @@ func (r rect) perim() float64 {
     return 2*r.width + 2*r.height
 }
 ```
-To implement an interface in Go, we just need to implement all the methods in the interface.
 
+To implement an interface in Go, we just need to implement all the methods in the interface.
 
 If a variable has an interface type, then we can call methods that are in the named interface.
 
@@ -737,6 +738,97 @@ func measure(g geometry) {
 }
 ```
 
+# Enumerated Types (Enums)
+
+Go doesn’t have a built-in `enum` type, but enums can be implemented using constants and the `iota` keyword.
+
+---
+
+### Example
+
+```go
+package main
+
+import "fmt"
+
+// Define an enum-like type with underlying int
+type ServerState int
+
+// Define possible values using iota
+const (
+    StateIdle ServerState = iota
+    StateConnected
+    StateError
+    StateRetrying
+)
+```
+
+`iota` generates successive constant values automatically (0, 1, 2, ...).
+
+---
+
+### Adding String Representation
+
+To make enum values printable, implement the `fmt.Stringer` interface:
+
+```go
+var stateName = map[ServerState]string{
+    StateIdle:      "idle",
+    StateConnected: "connected",
+    StateError:     "error",
+    StateRetrying:  "retrying",
+}
+
+func (ss ServerState) String() string {
+    return stateName[ss]
+}
+```
+
+This allows direct printing of `ServerState` values, e.g. `fmt.Println(StateIdle)` → `idle`.
+
+If there are many enum values, this can be automated with the `stringer` tool using `go:generate`.
+
+---
+
+### Using the Enum
+
+```go
+func main() {
+    ns := transition(StateIdle)
+    fmt.Println(ns)
+    ns2 := transition(ns)
+    fmt.Println(ns2)
+}
+```
+
+---
+
+### State Transition Example
+
+```go
+func transition(s ServerState) ServerState {
+    switch s {
+    case StateIdle:
+        return StateConnected
+    case StateConnected, StateRetrying:
+        // logic for transitioning back to idle
+        return StateIdle
+    case StateError:
+        return StateError
+    default:
+        panic(fmt.Errorf("unknown state: %s", s))
+    }
+}
+```
+
+---
+
+### Key Points
+
+- Enums in Go are implemented using **typed constants**.
+- `iota` automatically increments values within a constant block.
+- Implementing `String()` improves readability and debuggability.
+- Using a distinct type (e.g., `ServerState int`) enforces **compile-time type safety** — you can’t pass a plain `int` where a `ServerState` is expected.
 
 [continue here](https://gobyexample.com/enums)
 
