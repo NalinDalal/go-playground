@@ -742,8 +742,6 @@ func measure(g geometry) {
 
 Go doesn’t have a built-in `enum` type, but enums can be implemented using constants and the `iota` keyword.
 
----
-
 ### Example
 
 ```go
@@ -764,8 +762,6 @@ const (
 ```
 
 `iota` generates successive constant values automatically (0, 1, 2, ...).
-
----
 
 ### Adding String Representation
 
@@ -788,8 +784,6 @@ This allows direct printing of `ServerState` values, e.g. `fmt.Println(StateIdle
 
 If there are many enum values, this can be automated with the `stringer` tool using `go:generate`.
 
----
-
 ### Using the Enum
 
 ```go
@@ -800,8 +794,6 @@ func main() {
     fmt.Println(ns2)
 }
 ```
-
----
 
 ### State Transition Example
 
@@ -821,8 +813,6 @@ func transition(s ServerState) ServerState {
 }
 ```
 
----
-
 ### Key Points
 
 - Enums in Go are implemented using **typed constants**.
@@ -830,7 +820,41 @@ func transition(s ServerState) ServerState {
 - Implementing `String()` improves readability and debuggability.
 - Using a distinct type (e.g., `ServerState int`) enforces **compile-time type safety** — you can’t pass a plain `int` where a `ServerState` is expected.
 
-[continue here](https://gobyexample.com/enums)
+---
+
+# Struct Embedding
+
+embedding of structs and interfaces to express a more seamless composition of types.
+
+A container embeds a base. An embedding looks like a field without a name.
+
+```go
+type container struct {
+    base
+    str string
+}
+```
+
+When creating structs with literals, we have to initialize the embedding explicitly;
+
+```go
+co := container{
+        base: base{
+            num: 1,
+        },
+        str: "some name",
+    }
+```
+
+can access fields direcrtly like: `co.base.num` or `co.str`
+
+Since container embeds base, the methods of base also become methods of a container.
+
+```go
+fmt.Println("describe:", co.describe())
+```
+
+[continue here](https://gobyexample.com/generics)
 
 ---
 
