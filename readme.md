@@ -854,7 +854,113 @@ Since container embeds base, the methods of base also become methods of a contai
 fmt.Println("describe:", co.describe())
 ```
 
-[continue here](https://gobyexample.com/generics)
+---
+
+# Generics
+
+Starting with **Go 1.18**, Go introduced support for **generics**, also known as **type parameters**.
+Generics allow functions and types to operate on values of different types **without duplicating code**.
+
+### Example: Generic Function
+
+```go
+package main
+
+import "fmt"
+
+func SlicesIndex[S ~[]E, E comparable](s S, v E) int {
+    for i := range s {
+        if v == s[i] {
+            return i
+        }
+    }
+    return -1
+}
+
+func main() {
+    var s = []string{"foo", "bar", "zoo"}
+
+    fmt.Println("index of zoo:", SlicesIndex(s, "zoo"))
+    _ = SlicesIndex[[]string, string](s, "zoo") // explicit type args
+}
+```
+
+### Explanation
+
+- **Type parameters** appear inside square brackets `[S ~[]E, E comparable]`.
+- `S ~[]E` means: `S` is a slice type whose element type is `E`.
+- `E comparable` constrains `E` to types that can be compared using `==` and `!=`.
+- The function iterates through the slice and returns the **index** of the first matching element.
+- Returns `-1` if not found.
+- The **compiler can infer** type parameters in most cases, so explicit type arguments are usually not needed.
+
+  **Note:**
+  A similar function already exists in Go’s standard library as `slices.Index`.
+
+### Example: Generic Type
+
+```go
+type List[T any] struct {
+    head, tail *element[T]
+}
+
+type element[T any] struct {
+    next *element[T]
+    val  T
+}
+```
+
+This defines a **singly-linked list** whose elements can be of **any type** `T`.
+
+### Methods on Generic Types
+
+We can define methods on generic types the same way as on regular types,
+but we must **include the type parameter** when defining the receiver.
+
+```go
+func (lst *List[T]) Push(v T) {
+    if lst.tail == nil {
+        lst.head = &element[T]{val: v}
+        lst.tail = lst.head
+    } else {
+        lst.tail.next = &element[T]{val: v}
+        lst.tail = lst.tail.next
+    }
+}
+
+func (lst *List[T]) AllElements() []T {
+    var elems []T
+    for e := lst.head; e != nil; e = e.next {
+        elems = append(elems, e.val)
+    }
+    return elems
+}
+```
+
+### Using the Generic List
+
+```go
+func main() {
+    lst := List[int]{}
+    lst.Push(10)
+    lst.Push(13)
+    lst.Push(23)
+    fmt.Println("list:", lst.AllElements())
+}
+```
+
+### Key Points
+
+- **Generics** enable writing reusable, type-safe code without sacrificing performance.
+- **Type parameters** are defined in square brackets `[T any]`.
+- **Constraints** (`comparable`, `~[]E`, etc.) define what operations are allowed on the type.
+- **Type inference** means you often don’t need to explicitly specify type parameters.
+- You can create **generic functions**, **generic types**, and **methods** on them.
+- The type name with its parameters (e.g. `List[T]`) must always include the `[T]` when defining methods.
+
+---
+
+[continue here](https://gobyexample.com/range-over-iterators)
 
 ---
 
@@ -862,9 +968,5 @@ fmt.Println("describe:", co.describe())
 [tour](https://go.dev/tour/basics/1)
 [tcp-to-http](https://www.youtube.com/watch?v=FknTw9bJsXM&list=WL&index=1&t=18s)
 [web-dev in go](https://gowebexamples.com/)
-
-[officially to go thru like book](https://gobyexample.com/)
-
-[gobook](https://github.com/adonovan/gopl.io)
 
 [cohort-docs](https://petal-estimate-4e9.notion.site/Golang-cohort-1257dfd1073580238258fe25973c319b)
