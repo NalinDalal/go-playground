@@ -960,7 +960,221 @@ func main() {
 
 ---
 
-[continue here](https://gobyexample.com/range-over-iterators)
+# Range over Iterators
+
+previous example: `AllElements` method that returned a slice of all elements in the list.
+we can do better
+
+Starting with **Go 1.23**, Go added **iterators**, allowing us to **range over almost any sequence** including linked lists, streams, or even infinite sequences without converting to a slice first.
+
+Iterators in Go are **functions with a specific signature**, which take a `yield` callback function. `yield` is called for each element in the sequence, and can signal **early termination** by returning `false`.
+
+```go
+//Example: Iterator for a Linked List
+type List[T any] struct {
+    head, tail *element[T]
+}
+
+type element[T any] struct {
+    next *element[T]
+    val  T
+}
+
+func (lst *List[T]) Push(v T) {
+    if lst.tail == nil {
+        lst.head = &element[T]{val: v}
+        lst.tail = lst.head
+    } else {
+        lst.tail.next = &element[T]{val: v}
+        lst.tail = lst.tail.next
+    }
+}
+
+// Returns an iterator
+func (lst *List[T]) All() iter.Seq[T] {
+    return func(yield func(T) bool) {
+        for e := lst.head; e != nil; e = e.next {
+            if !yield(e.val) {
+                return
+            }
+        }
+    }
+}
+```
+
+## How It Works
+
+- `iter.Seq[T]` is the **iterator type**, a function that accepts `yield func(T) bool`.
+- Each element is sent to `yield`.
+- If `yield` returns `false`, iteration stops early.
+- No intermediate slice is needed — iteration is **lazy** and memory-efficient.
+
+## Using the Iterator
+
+```go
+func main() {
+    lst := List[int]{}
+    lst.Push(10)
+    lst.Push(13)
+    lst.Push(23)
+
+    // Iterate using range
+    for e := range lst.All() {
+        fmt.Println(e)
+    }
+
+    // Collect all values into a slice
+    all := slices.Collect(lst.All())
+    fmt.Println("all:", all)
+}
+```
+
+## Infinite Iterators Example (Fibonacci)
+
+```go
+func genFib() iter.Seq[int] {
+    return func(yield func(int) bool) {
+        a, b := 1, 1
+        for {
+            if !yield(a) {
+                return
+            }
+            a, b = b, a+b
+        }
+    }
+}
+
+func main() {
+    for n := range genFib() {
+        if n > 50 { // early exit
+            break
+        }
+        fmt.Println(n)
+    }
+}
+```
+
+**Key Points**
+
+- Iterators allow **lazy iteration** over any sequence, including infinite ones.
+- The `yield` function controls both output and early termination.
+- Packages like `slices` provide helper functions like `Collect` to gather iterator values into slices.
+- Iterators remove the need for intermediate allocations like `AllElements()` slices.
+
+---
+
+# Errors
+
+Error handling is accounting for scenarios when the code fails
+
+By convention, errors are the last return value and have type error, a built-in interface.
+
+example:
+
+```go
+func f(arg int) (int, error) {
+    if arg == 42 {
+        return -1, errors.New("can't work with 42")
+    }
+    return arg + 3, nil
+}
+```
+
+`errors.New` constructs a basic error value with the given error message.
+example:
+
+```go
+return errors.New("can't work with 42")
+```
+
+A `nil` value in the error position indicates that there was no error.
+
+```go
+return arg + 3, nil
+```
+
+`sentinel` error: predeclared variable that is used to signify a specific error condition.
+
+```go
+var ErrOutOfTea = errors.New("no more tea available")
+var ErrPower = errors.New("can't boil water")
+```
+
+Note: you can wrap errors with error to add context, it's cause Wrapped errors create a logical chain (A wraps B, which wraps C, etc.) .
+
+```go
+func makeTea(arg int) error {
+    if arg == 2 {
+        return ErrOutOfTea
+    } else if arg == 4 {
+
+        return fmt.Errorf("making tea: %w", ErrPower)
+    }
+    return nil
+}
+```
+
+idomatically you should use errors in if-else blocks
+
+```go
+for _, i := range []int{7, 42} {
+
+        if r, e := f(i); e != nil {
+            fmt.Println("f failed:", e)
+        } else {
+            fmt.Println("f worked:", r)
+        }
+    }
+```
+
+`errors.Is` checks that given error matches a specific error value.
+useful with wrapped or nested errors,
+
+```go
+if errors.Is(err, ErrOutOfTea) {
+    fmt.Println("We should buy new tea!")
+} else if errors.Is(err, ErrPower) {
+    fmt.Println("Now it is dark.")
+} else {
+    fmt.Printf("unknown error: %s\n", err)
+}
+```
+
+# Errors : Custom
+
+define custom error types by implementing the `Error()` method on them
+conventions is to have suffix `Error` in nomenclature, ex: `argError`
+
+```go
+//declaration
+type argError struct {
+    arg     int
+    message string
+}
+
+// implementing interface
+func (e *argError) Error() string {
+    return fmt.Sprintf("%d - %s", e.arg, e.message)
+}
+
+
+func f(arg int) (int, error) {
+    if arg == 42 {
+        //Return our custom error.
+
+        return -1, &argError{arg, "can't work with it"}
+    }
+    return arg + 3, nil
+}
+```
+
+`errors.As` is a more advanced version of `errors.Is`
+checks that a given error (or any error in its chain) matches a specific error type and converts to a value of that type, returning true.
+If there’s no match, it returns false.
+
+---
+
+[continue here](https://gobyexample.com/goroutines)
 
 ---
 
