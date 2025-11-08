@@ -1174,7 +1174,47 @@ If there’s no match, it returns false.
 
 ---
 
-[continue here](https://gobyexample.com/goroutines)
+# Go Routines
+
+lightweight thread of execution.
+
+say we have a function `f(s)` we call it normally in main function like
+
+```go
+func main() {
+
+    f("direct")
+    //runs synchornously
+}
+```
+
+but to invoke in `go-routines` we do like:
+
+```go
+func main(){
+    go f("goroutine")
+    //execute concurrently with the calling one.
+}
+```
+
+can do same for anonymous functions
+
+```go
+go func(msg string) {
+        fmt.Println(msg)
+    }("going")
+```
+
+both are calling asynchonosuly so we wait for them to finish up
+
+```go
+time.Sleep(time.Second)
+    fmt.Println("done")
+```
+
+---
+
+[continue here](https://gobyexample.com/channels)
 
 ---
 
