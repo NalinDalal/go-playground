@@ -1214,7 +1214,31 @@ time.Sleep(time.Second)
 
 ---
 
-[continue here](https://gobyexample.com/channels)
+# Channels
+
+pipes that connect concurrent goroutine
+it's like channel has 2 endpoint, both have a goroutine at them
+1 will send data and another will receive it
+
+initialize channel:
+`make(chan val-type)` ; typed by values they convey
+Send a value into a channel using the `channel <-` syntax.
+
+The `<-channel` syntax $$receives$$ a value from the channel.
+
+```go
+
+    messages := make(chan string)   //channel initialized
+
+    go func() { messages <- "ping" }()  //value 'ping' sent into channel
+
+    msg := <-messages
+    fmt.Println(msg)
+```
+
+By default sends and receives block until both the sender and receiver are ready. so no need to worry about synchronisation.
+
+[continue here](https://gobyexample.com/channel-buffering)
 
 ---
 
