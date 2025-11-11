@@ -1238,7 +1238,78 @@ The `<-channel` syntax $$receives$$ a value from the channel.
 
 By default sends and receives block until both the sender and receiver are ready. so no need to worry about synchronisation.
 
-[continue here](https://gobyexample.com/channel-buffering)
+## Channel Buffering
+
+by default channels are `unbuffered` i.e. they will only receive data
+
+Buffered channels accept a limited number of values without a corresponding receiver for those values.
+
+```go
+make(chan string, 2)    //channel made for strings Buffering upto 2 values
+//can send data without concurrent receiver
+messages <- "buffered"
+messages <- "channel"
+```
+
+## Channel Synchronisation
+
+channels can be used to synchronis the executions across goroutines.
+take an example where you can block `receive` to wait for multiple goroutines to finish.
+
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func worker(done chan bool) {
+    fmt.Print("working...")
+    time.Sleep(time.Second)
+    fmt.Println("done")
+
+    done <- true
+}
+
+func main() {
+
+    done := make(chan bool, 1)
+    go worker(done)
+
+    <-done
+}
+```
+
+`done:=make(chan bool,1)` a worker is made and then you gave it channel to work on.
+
+`<-done` basically does what is tells the program to wait until worker is done
+if we remove it then it will exit directly, without waiting for worker to finish.
+
+## Channel Direction
+
+well you can specify if channel will send or receive
+increases type-safety
+
+we use spcl words `ping` to receive, and `pong` to send/transmit data
+need to give out this in function arguments
+
+```go
+func ping(pings chan<- string, msg string) {
+    //single channel to send only
+    pings <- msg
+}
+
+func pong(pings <-chan string, pongs chan<- string) {
+    //accepts 1 channel to receive, 1 to send
+    msg := <-pings
+    pongs <- msg
+}
+```
+
+if you try to send data when only receive is argued then it will create compile time errors.
+
+[continue here](https://gobyexample.com/select)
 
 ---
 
