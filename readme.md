@@ -1309,9 +1309,76 @@ func pong(pings <-chan string, pongs chan<- string) {
 
 if you try to send data when only receive is argued then it will create compile time errors.
 
-[continue here](https://gobyexample.com/select)
+## Select
+
+`select` lets you wait on multiple channel operations.
+Combining goroutines and channels with select is a powerful feature of Go.
+allows a goroutine to wait on multiple channel operations simultaneously.
+
+```go
+ // Two channels for concurrent communication
+    c1 := make(chan string)
+    c2 := make(chan string)
+
+    // Simulate two concurrent operations
+    go func() {
+        time.Sleep(1 * time.Second)
+        c1 <- "one"
+    }()
+
+    go func() {
+        time.Sleep(2 * time.Second)
+        c2 <- "two"
+    }()
+
+    // Wait for both results using select
+    for range 2 {
+        select {
+        case msg1 := <-c1:
+            fmt.Println("received", msg1)
+        case msg2 := <-c2:
+            fmt.Println("received", msg2)
+        }
+    }
+```
+
+- Each goroutine sends a message after a delay (`1s` and `2s`) — simulating **blocking RPC calls** or **network operations**.
+- The `select` statement waits on **multiple channel operations** and executes the **first one that becomes ready**.
+- When multiple cases are ready, one is chosen **at random**.
+
+well you can time the process:
+
+```sh
+time go run select.go
+```
+
+Output:
+
+```
+received one
+received two
+```
+
+Total time ≈ **2 seconds**, since both goroutines sleep and send concurrently.
+
+### Key Points
+
+- `select` listens on **multiple channel operations** (`send` or `receive`).
+- It **blocks** until one of the cases can proceed.
+- When a case executes, the others are **ignored** for that iteration.
+- Great for handling **multiple concurrent results**, **timeouts**, or **fan-in** patterns.
+
+### Use Cases
+
+- Waiting for the **first available result** among multiple goroutines.
+- Implementing **timeouts** or **cancellation** logic.
+- **Merging multiple input channels** into a single consumer.
+
+> `select` is like a `switch`, but for **channels** — letting Go routines communicate efficiently and handle whichever channel becomes ready first.
 
 ---
+
+[continue](https://gobyexample.com/timeouts)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
