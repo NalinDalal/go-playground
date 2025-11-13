@@ -1378,7 +1378,92 @@ Total time ≈ **2 seconds**, since both goroutines sleep and send concurrently.
 
 ---
 
-[continue](https://gobyexample.com/timeouts)
+# Timeout
+
+helps connect to external resources or to bound execution time for long-running tasks.
+They help ensure your program doesn’t wait indefinitely for a response.
+
+we implement them using `channels` and `select`
+
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func main() {
+    // Simulate an external call that takes 2 seconds to complete
+    c1 := make(chan string, 1)
+    go func() {
+        time.Sleep(2 * time.Second)
+        c1 <- "result 1"
+    }()
+
+    // Wait for result or timeout after 1 second
+    select {
+    case res := <-c1:
+        fmt.Println(res)
+    case <-time.After(1 * time.Second):
+        fmt.Println("timeout 1")
+    }
+
+    // Another simulated call
+    c2 := make(chan string, 1)
+    go func() {
+        time.Sleep(2 * time.Second)
+        c2 <- "result 2"
+    }()
+
+    // This time, allow enough time for the operation to finish
+    select {
+    case res := <-c2:
+        fmt.Println(res)
+    case <-time.After(3 * time.Second):
+        fmt.Println("timeout 2")
+    }
+}
+```
+
+- **`time.After(d)`** returns a channel that sends a value after `d` duration.
+- In each `select`, we wait for either:
+  - the result from the worker goroutine, or
+  - the timeout signal from `time.After`.
+
+- Whichever channel becomes **ready first** determines which case executes.
+
+### Output
+
+```
+timeout 1
+result 2
+```
+
+**Explanation of output:**
+
+- The first operation takes 2 seconds but we only wait 1 second → timeout triggered.
+- The second operation also takes 2 seconds, but the timeout is 3 seconds → result received successfully.
+
+### Why Buffered Channels?
+
+Each worker uses a **buffered channel** (`make(chan string, 1)`):
+
+- Prevents a **goroutine leak** in case the result is never read.
+- Without buffering, the send (`c1 <- "result 1"`) could block forever if no receiver is ready.
+
+### Key Points
+
+- `time.After(duration)` provides a **timeout signal** via channel.
+- `select` ensures your code reacts to **whichever event happens first**.
+- Use buffered channels to **avoid blocking** when sending results from background goroutines.
+- Commonly used for **network calls**, **API requests**, and **resource polling**.
+
+> Combine `select` + `time.After` to handle operations that might take too long — safely and cleanly.
+
+---
+
+[continue](https://gobyexample.com/non-blocking-channel-operations)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
