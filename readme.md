@@ -1463,7 +1463,118 @@ Each worker uses a **buffered channel** (`make(chan string, 1)`):
 
 ---
 
-[continue](https://gobyexample.com/non-blocking-channel-operations)
+# [Non-Blocking Channel Operations](./non-blocking-channel-operations.go)
+
+Normally:
+
+- **Send** blocks until someone receives.
+- **Receive** blocks until someone sends.
+
+But sometimes you want:
+
+- **Try to send/receive without waiting**
+- **Poll a channel**
+- **Check if something is available**
+- **Avoid goroutine deadlocks**
+
+we use `select+default`
+
+## Non-Blocking Receive
+
+```go
+select {
+case msg := <-messages:
+    fmt.Println("received", msg)
+default:
+    fmt.Println("no message received")
+}
+```
+
+### Meaning
+
+- If a value is **ready** on `messages`, it is taken.
+- If not, **default triggers immediately** — no blocking at all.
+
+This turns the receive into a **"try receive"**.
+
+## Non-Blocking Send
+
+```go
+msg := "hi"
+select {
+case messages <- msg:
+    fmt.Println("sent", msg)
+default:
+    fmt.Println("no message sent")
+}
+```
+
+### **Meaning**
+
+- If channel can accept a value **right now**, send succeeds.
+- If channel is:
+  - unbuffered (no receiver),
+  - OR buffered but full
+    → **default triggers**.
+
+This turns send into a **"try send"**.
+
+## **Multi-Way Non-Blocking Select**
+
+```go
+select {
+case msg := <-messages:
+    fmt.Println("received message", msg)
+case sig := <-signals:
+    fmt.Println("received signal", sig)
+default:
+    fmt.Println("no activity")
+}
+```
+
+### **Meaning**
+
+Tries multiple operations _at once_, but if all would block → default fires.
+
+Useful for:
+
+- polling multiple channels
+- implementing timeouts
+- checking state in event loops
+
+## **Mental Model**
+
+Think of channels + select as:
+
+### **A multiplexed switch with fallbacks**
+
+Go asks:
+
+- “Which of these operations can run **NOW**?”
+- If none ⇒ run `default`.
+
+It does **not wait** even 1 microsecond.
+
+## **When to Use Non-Blocking Channels**
+
+- event loops
+- actor-model systems
+- networking
+- avoiding blocking on slow goroutines
+- implementing “try acquire” behaviours
+- concurrent state machines
+
+```
+no message received
+no message sent
+no activity
+```
+
+Because:
+
+- `messages` & `signals` were empty and no receivers exist.
+
+[continue](https://gobyexample.com/closing-channels)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
