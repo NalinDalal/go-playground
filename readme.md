@@ -1574,7 +1574,108 @@ Because:
 
 - `messages` & `signals` were empty and no receivers exist.
 
-[continue](https://gobyexample.com/closing-channels)
+---
+
+# [closing-channels](./channel-closing.go)
+
+**1. Why Close a Channel?**
+
+Closing a channel means:
+
+- **no more values will be sent**
+- receivers can detect completion
+- helps workers know “stop now, no more work”
+
+**Important:**
+Closing is done **only by the sender**, never by receivers.
+
+**2. Worker Pattern Using Close**
+
+```go
+jobs := make(chan int, 5)
+done := make(chan bool)
+```
+
+Worker goroutine:
+
+```go
+go func() {
+    for {
+        j, more := <-jobs   // 2-value receive
+        if more {
+            fmt.Println("received job", j)
+        } else {
+            fmt.Println("received all jobs")
+            done <- true
+            return
+        }
+    }
+}()
+```
+
+**What is `j, more := <-jobs`?**
+
+- `j` → value from channel
+- `more` → **false when channel is closed AND empty**
+
+So when `more == false`:
+
+- no more jobs
+- channel is drained
+- worker should exit
+
+  **3. Sending Jobs + Closing Channel**
+
+```go
+for j := 1; j <= 3; j++ {
+    jobs <- j
+    fmt.Println("sent job", j)
+}
+close(jobs)
+fmt.Println("sent all jobs")
+```
+
+Sender logic:
+
+- push 3 jobs
+- close channel → signals “done sending”
+
+  **4. Waiting for Worker**
+
+```go
+<-done
+```
+
+Main goroutine blocks until worker signals completion.
+
+**5. Behavior of Reading From a Closed Channel**
+
+```go
+_, ok := <-jobs
+fmt.Println("received more jobs:", ok)
+```
+
+- Reading from a closed channel **never blocks**
+- Returns zero-value of type
+- `ok == false` means:
+  - channel closed
+  - no more values
+
+This is how Go signals “finished”.
+
+**6. Mental Model**
+
+Closing a channel ≠ stopping a goroutine.
+Closing a channel = **broadcasting “I will never send again”**.
+
+Workers detect this using:
+
+- `v, ok := <-ch`
+- OR `for v := range ch` (next example)
+
+---
+
+[continue](https://gobyexample.com/range-over-channels)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
