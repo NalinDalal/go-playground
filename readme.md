@@ -1309,7 +1309,7 @@ func pong(pings <-chan string, pongs chan<- string) {
 
 if you try to send data when only receive is argued then it will create compile time errors.
 
-## Select
+## [Select](./select.go)
 
 `select` lets you wait on multiple channel operations.
 Combining goroutines and channels with select is a powerful feature of Go.
@@ -1378,7 +1378,7 @@ Total time ≈ **2 seconds**, since both goroutines sleep and send concurrently.
 
 ---
 
-# Timeout
+# [Timeout](./timeout.go)
 
 helps connect to external resources or to bound execution time for long-running tasks.
 They help ensure your program doesn’t wait indefinitely for a response.
@@ -1675,7 +1675,26 @@ Workers detect this using:
 
 ---
 
-[continue](https://gobyexample.com/range-over-channels)
+# [Range over Channel](./range-over-channel.go)
+
+we already saw how `for` and `range` provide iteration over basic data structures.
+
+use this syntax to iterate over values received from a channel.
+
+```go
+//iterate over 2 values in channel
+queue := make(chan string, 2)
+    queue <- "one"
+    queue <- "two"
+    close(queue)
+
+//iterate over each elem as received from queue
+    for elem := range queue {
+        fmt.Println(elem)
+    }
+```
+
+[continue](https://gobyexample.com/timers)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
