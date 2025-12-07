@@ -1694,7 +1694,48 @@ queue := make(chan string, 2)
     }
 ```
 
-[continue](https://gobyexample.com/timers)
+---
+
+# [Timers](./timers.go)
+
+execute go-code in future and repeatedly
+Go’s built-in timer and ticker features make both of these tasks easy
+
+Timer is basically a single event in future.
+You specify a duration, and Go gives you a **channel** (`timer.C`) that sends a signal **when the timer fires**.
+
+Use cases:
+
+- delay execution
+- schedule a one-time event
+- cancel a future event before it happens
+
+```go
+timer1 := time.NewTimer(2 * time.Second) //timer created; fires after 2 seconds
+
+<-timer1.C  //exposes channel C;Receiving from it blocks until the timer fires.
+//block until 2 seconds pass
+fmt.Println("Timer 1 fired")
+
+timer2 := time.NewTimer(time.Second)
+
+go func() {
+    <-timer2.C
+    fmt.Println("Timer 2 fired")
+}()
+//prints "Timer 2 fired" after 1s; unless stopped
+stop2 := timer2.Stop()
+if stop2 {
+    fmt.Println("Timer 2 stopped")
+}
+//Stop() basically prevents timer firing, returns true if stopped, else false
+
+time.Sleep(2 * time.Second)
+//verify if timer stopped
+
+```
+
+[continue](https://gobyexample.com/tickers)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
