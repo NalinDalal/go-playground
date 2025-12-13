@@ -1732,8 +1732,33 @@ if stop2 {
 
 time.Sleep(2 * time.Second)
 //verify if timer stopped
-
 ```
+
+---
+
+# [Tickers](./tickers.go)
+
+timers: something in future
+tickers: want to do something repeatedly at some interval
+
+they use similar to timers: a channel that is sent values.
+
+```go
+ticker := time.NewTicker(500 * time.Millisecond)    //value arrive every 500ms
+    done := make(chan bool)
+```
+
+tickers can be stopped like timers.
+Once a ticker is stopped it won’t receive any more values on its channel.
+
+```go
+time.Sleep(1600 * time.Millisecond)
+ticker.Stop()
+done <- true
+fmt.Println("Ticker stopped")
+```
+
+---
 
 [continue](https://gobyexample.com/tickers)
 
