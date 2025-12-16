@@ -1760,7 +1760,58 @@ fmt.Println("Ticker stopped")
 
 ---
 
-[continue](https://gobyexample.com/tickers)
+# [Worker Pools](./worker-p0ols.go)
+
+implement a worker pool using goroutines and channels.
+
+1. we create a worker that runs multiple concurrent instances
+   receives from `job` channel, sends to `result` channel
+
+```go
+func worker(id int, jobs <-chan int, results chan<- int) {
+    for j := range jobs {
+        fmt.Println("worker", id, "started  job", j)
+        time.Sleep(time.Second)
+        fmt.Println("worker", id, "finished job", j)
+        results <- j * 2
+    }
+}
+```
+
+2. to use pool of worker, need to send them work and collect their results(2 channels).
+
+```go
+const numJobs = 5
+    jobs := make(chan int, numJobs)
+    results := make(chan int, numJobs)
+```
+
+3. start 3 workers; initially blocked
+
+```go
+for w := 1; w <= 3; w++ {
+        go worker(w, jobs, results)
+    }
+```
+
+4. send jobs and close the channel
+
+```go
+for j := 1; j <= numJobs; j++ {
+    jobs <- j
+}
+close(jobs)
+```
+
+5. collect all results, ensure all routines are finished; alt is to use [WaitGroups](#WaitGroups)
+
+```go
+for a := 1; a <= numJobs; a++ {
+        <-results
+    }
+```
+
+[continue](https://gobyexample.com/worker-pools)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
