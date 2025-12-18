@@ -1811,7 +1811,32 @@ for a := 1; a <= numJobs; a++ {
     }
 ```
 
-[continue](https://gobyexample.com/worker-pools)
+---
+
+# [WaitGroups](./waitgroups.go)
+
+used to wait for multiple goroutines to finish
+if a WaitGroup is explicitly passed into functions, it should be done by pointer.
+
+```go
+var wg sync.WaitGroup
+```
+
+Launch several goroutines using WaitGroup.Go
+
+```go
+for i := 1; i <= 5; i++ {
+        wg.Go(func() {
+            worker(i)
+        })
+    }
+```
+
+you should wait until all goroutines are done; usually done when function it invokes returns.
+
+---
+
+[continue](https://gobyexample.com/waitgroups)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
