@@ -1836,7 +1836,85 @@ you should wait until all goroutines are done; usually done when function it inv
 
 ---
 
-[continue](https://gobyexample.com/waitgroups)
+# [Rate Limiting](./rate-limit.go)
+
+used to control resource utilisation and maintaining quality of service.
+
+let's say you want to limit handling of incoming request:
+
+- make a channel
+- channel has limit of 5(bucket algorithm)
+- close channel when bucket is filled
+
+```go
+requests := make(chan int, 5)
+    for i := 1; i <= 5; i++ {
+        requests <- i
+    }
+    close(requests)
+limiter := time.Tick(200 * time.Millisecond)    //receives a value every 200ms
+```
+
+allow short bursts of requests in our rate limiting scheme while preserving the overall rate limit.
+buffer our limiter channel
+This `burstyLimiter` channel will allow bursts of up to 3 events.
+
+```go
+burstyLimiter := make(chan time.Time, 3)
+```
+
+Fill up the channel to represent allowed bursting.
+
+```go
+    for range 3 {
+        burstyLimiter <- time.Now()
+    }
+```
+
+Every 200 milliseconds we’ll try to add a new value to burstyLimiter, up to its limit of 3.
+
+```go
+go func() {
+        for t := range time.Tick(200 * time.Millisecond) {
+            burstyLimiter <- t
+        }
+    }()
+```
+
+usage:
+
+```go
+burstyRequests := make(chan int, 5)
+    for i := 1; i <= 5; i++ {
+        burstyRequests <- i
+    }
+    close(burstyRequests)
+    for req := range burstyRequests {
+        <-burstyLimiter
+        fmt.Println("request", req, time.Now())
+    }
+```
+
+as we can notice, the batch of request are handled every 200ms
+then for 2nd batch, 3 are immediately erved due to burstable rate-limit, then remaining 2 are served with delay of ~200ms each
+
+```
+request 1 2012-10-19 00:38:18.687438 +0000 UTC
+request 2 2012-10-19 00:38:18.887471 +0000 UTC
+request 3 2012-10-19 00:38:19.087238 +0000 UTC
+request 4 2012-10-19 00:38:19.287338 +0000 UTC
+request 5 2012-10-19 00:38:19.487331 +0000 UTC
+
+request 1 2012-10-19 00:38:20.487578 +0000 UTC
+request 2 2012-10-19 00:38:20.487645 +0000 UTC
+request 3 2012-10-19 00:38:20.487676 +0000 UTC
+request 4 2012-10-19 00:38:20.687483 +0000 UTC
+request 5 2012-10-19 00:38:20.887542 +0000 UTC
+```
+
+---
+
+[continue](https://gobyexample.com/atomic-counters)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
 [tour](https://go.dev/tour/basics/1)
