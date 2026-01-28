@@ -1914,6 +1914,130 @@ request 5 2012-10-19 00:38:20.887542 +0000 UTC
 
 ---
 
+# [Atomic Counters](./atomic-counter.go)
+
+The primary mechanism for managing state in Go is communication over channels.
+We saw this pattern earlier with worker pools and fan-out/fan-in designs.
+
+Sometimes, though, we just need **a shared counter** that is safely accessed by multiple goroutines.
+For this, Go provides **atomic operations** via the `sync/atomic` package.
+
+Atomic operations allow **lock-free**, thread-safe manipulation of basic values.
+
+```go
+#We’ll use an atomic integer to represent our counter.
+#The value is always non-negative.
+
+    var ops atomic.Uint64
+```
+
+A `WaitGroup` helps us wait until all goroutines finish.
+
+```go
+    var wg sync.WaitGroup
+```
+
+We start 50 goroutines.
+Each goroutine increments the counter 1000 times.
+
+```go
+    for range 50 {
+        wg.Add(1)
+        go func() {
+            defer wg.Done()
+            for range 1000 {
+```
+
+To increment atomically, we use `Add`.
+This guarantees **no data race**, even with concurrent access.
+
+```go
+                ops.Add(1)
+            }
+        }()
+    }
+```
+
+Wait for all goroutines to complete.
+
+```go
+    wg.Wait()
+```
+
+Now we read the value using `Load`.
+Even if goroutines were still running, this read would be safe.
+
+```go
+    fmt.Println("ops:", ops.Load())
+}
+```
+
+### Output
+
+```bash
+$ go run atomic-counters.go
+ops: 50000
+```
+
+## Why Atomic Works Here
+
+`ops.Add(1)` is:
+
+- A **single atomic CPU instruction**
+- Lock-free
+- Guaranteed to be race-free
+
+If we had used:
+
+```go
+ops++
+```
+
+We would get:
+
+- Incorrect counts
+- Different results per run
+- Data race failures with `-race`
+
+## Atomic Types in Go
+
+Common atomic types:
+
+- `atomic.Int32`
+- `atomic.Int64`
+- `atomic.Uint64`
+- `atomic.Bool`
+- `atomic.Pointer[T]`
+
+Common operations:
+
+- `Add(n)`
+- `Load()`
+- `Store(v)`
+- `Swap(v)`
+- `CompareAndSwap(old, new)`
+
+## When to Use Atomic Counters
+
+✔ Simple counters
+✔ Metrics
+✔ Flags
+✔ Stats (requests, errors, retries)
+
+## When **NOT** to Use Atomic
+
+- Multiple related fields
+- Complex state
+- Invariants across variables
+
+If you need to update **more than one thing together**, atomic is the wrong tool.
+
+## Mental Model
+
+- Atomic = **one variable, one operation**
+- Mutex = **many variables, one critical section**
+- Channel = **communication instead of sharing**
+
 [continue](https://gobyexample.com/atomic-counters)
 
 [docs](https://go.dev/doc/tutorial/getting-started)
